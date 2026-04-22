@@ -499,6 +499,98 @@ Each slide object supports:
 
 **Rule: always mirror your rendered colors.** If the HTML slide has `background:#1F2937` and a blue header `#0062FF`, pass `bg:'1F2937'` and `headerBg:'0062FF'`. Never leave these fields empty when your visualization uses a dark or branded theme.
 
+---
+
+### IBM Consulting PPTX theme palette
+
+These are the exact themes from the IBM Consulting Offerings presentation template. Use these when the user asks for IBM Consulting–style slides or when the rendered visualization already uses IBM Carbon Design System colors.
+
+#### IBM Carbon Design System — color reference
+
+| Token | Hex | Use |
+|---|---|---|
+| IBM Blue 60 (primary) | `0F62FE` | Headers, accents, bullets, stat numbers |
+| IBM Blue 80 | `002D9C` | Deep blue backgrounds, section dividers |
+| IBM Blue 70 | `0043CE` | Sub-section headers |
+| IBM Blue 40 | `4589FF` | Lighter accent, secondary bullets |
+| IBM Blue 20 | `A6C8FF` | Subtle tint on blue bg |
+| IBM Blue 10 | `EDF5FF` | Very light blue tint, light mode bg |
+| Carbon Gray 100 | `161616` | Near-black body bg |
+| Carbon Gray 90 | `262626` | Slightly lighter dark bg |
+| Carbon Gray 80 | `393939` | Dark surface |
+| Carbon Gray 60 | `6F6F6F` | Muted text |
+| Carbon Gray 30 | `C6C6C6` | Borders, dividers |
+| Carbon Gray 20 | `E0E0E0` | Light surface, table alternates |
+| Carbon Gray 10 | `F4F4F4` | Off-white bg |
+| IBM Yellow | `F1C21B` | Halo/impact accent (use sparingly) |
+| IBM Red 60 | `DA1E28` | Alerts, risk indicators |
+| IBM Purple 60 | `8A3FFC` | AI, cognitive accent |
+| IBM Teal 60 | `009D9A` | Sustainability, data accent |
+| IBM Green 50 | `24A148` | Positive outcomes, success |
+
+#### Layout themes — color combinations
+
+**1. Halo / Cover (L1)** — Black dramatic cover with yellow gold accent
+```
+bg:'000000', titleColor:'FFFFFF', bodyColor:'E0E0E0',
+accentColor:'F1C21B', subtitleColor:'A8A8A8'
+```
+
+**2. Dark Carbon (L2)** — Near-black bg with IBM Blue accents, most used content layout
+```
+bg:'161616', titleColor:'FFFFFF', bodyColor:'E0E0E0',
+accentColor:'0F62FE', subtitleColor:'8D8D8D',
+tableHeaderBg:'262626', tableHeaderColor:'FFFFFF'
+```
+
+**3. IBM Blue Header** — White body with a full-width IBM Blue header bar, flagship content layout
+```
+bg:'FFFFFF', headerBg:'0F62FE', headerH:1.3,
+titleColor:'FFFFFF', bodyColor:'161616',
+subtitleColor:'393939', accentColor:'0F62FE',
+tableHeaderBg:'E0E0E0', tableHeaderColor:'161616'
+```
+
+**4. Deep Navy / Section Divider** — Full deep navy background for section breaks
+```
+bg:'002D9C', titleColor:'FFFFFF', bodyColor:'D0E2FF',
+accentColor:'4589FF', subtitleColor:'A6C8FF',
+tableHeaderBg:'0043CE', tableHeaderColor:'FFFFFF'
+```
+
+**5. Multi-Tone Blue (Dashboard / Roadmap)** — Layered blues for data-dense slides
+```
+bg:'001D6C', headerBg:'0043CE', headerH:1.2,
+titleColor:'FFFFFF', bodyColor:'BAE6FF',
+accentColor:'4589FF', subtitleColor:'82CFFF',
+tableHeaderBg:'002D9C', tableHeaderColor:'FFFFFF'
+```
+
+**6. IBM Light / White (L3)** — Clean white background for body/detail content
+```
+bg:'F4F4F4', titleColor:'161616', bodyColor:'393939',
+accentColor:'0F62FE', subtitleColor:'6F6F6F',
+tableHeaderBg:'E0E0E0', tableHeaderColor:'161616'
+```
+
+**7. IBM Blue / White Split** — Blue left half, white right — for highlight + detail
+```
+bg:'FFFFFF', headerBg:'0F62FE', headerH:1.0,
+titleColor:'FFFFFF', bodyColor:'161616',
+accentColor:'0043CE', subtitleColor:'525252'
+```
+
+**8. IBM Yellow Highlight (Data / KPI)** — Black bg with yellow stat numbers
+```
+bg:'000000', titleColor:'F1C21B', bodyColor:'E0E0E0',
+accentColor:'F1C21B', subtitleColor:'A8A8A8',
+tableHeaderBg:'262626', tableHeaderColor:'F1C21B'
+```
+
+**Usage rule:** When the user asks for IBM Consulting style, IBM Carbon, or a slide that matches the rendered visualization, pick the closest theme above and pass ALL color fields. Always include `footer` with the source citation if the data has one.
+
+---
+
 ### downloadAsDOCX(htmlContent, filename)
 
 Generates and downloads a `.docx` Word document using html-docx-js.
