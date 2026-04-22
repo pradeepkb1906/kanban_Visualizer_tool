@@ -430,6 +430,85 @@ Use `openLink` for external references, documentation links, or source code link
 
 ---
 
+## Download buttons — Excel, PPTX, DOCX
+
+Three download functions are auto-injected into every visualization. Use them whenever the user asks for a downloadable file. Each function loads its CDN library on first click, so no `<script src>` tags are needed in your HTML.
+
+### downloadAsExcel(sheets, filename)
+
+Generates and downloads a `.xlsx` workbook using SheetJS.
+
+- `sheets` — array of `{name, headers, rows}` objects. `headers` is a string array; `rows` is a 2-D array of values.
+- `filename` — file name without extension (`.xlsx` appended automatically).
+
+```html
+<button onclick="downloadAsExcel([
+  {name:'Kanban', headers:['Task','Status','Priority','Owner'],
+   rows:[['Design mockups','Done','High','Alice'],
+         ['Backend API','In Progress','High','Bob'],
+         ['Write tests','To Do','Medium','Carol']]}
+], 'kanban-board')">Download Excel</button>
+```
+
+### downloadAsPPTX(slides, filename)
+
+Generates and downloads a `.pptx` file using PptxGenJS. Each slide object supports:
+- `title` — slide heading (22pt bold)
+- `subtitle` — sub-heading (14pt italic)
+- `items` — array of strings rendered as a bullet list
+- `table` — 2-D array; first row is treated as the header row
+
+```html
+<button onclick="downloadAsPPTX([
+  {title:'Kanban Board', subtitle:'Sprint 12 — April 2026',
+   table:[['Task','Status','Owner'],
+          ['Design mockups','Done','Alice'],
+          ['Backend API','In Progress','Bob'],
+          ['Write tests','To Do','Carol']]}
+], 'kanban-board')">Download PPTX</button>
+```
+
+### downloadAsDOCX(htmlContent, filename)
+
+Generates and downloads a `.docx` Word document using html-docx-js.
+
+- `htmlContent` — HTML string to embed (tables, headings, paragraphs). Pass `null` to auto-export the rendered visualization HTML.
+- `filename` — file name without extension (`.docx` appended automatically).
+
+```html
+<button onclick="downloadAsDOCX(
+  '<h1>Kanban Board</h1>' +
+  '<table>' +
+  '<tr><th>Task</th><th>Status</th><th>Owner</th></tr>' +
+  '<tr><td>Design mockups</td><td>Done</td><td>Alice</td></tr>' +
+  '<tr><td>Backend API</td><td>In Progress</td><td>Bob</td></tr>' +
+  '</table>',
+  'kanban-board')">Download DOCX</button>
+```
+
+### Button placement rules
+
+- Place download buttons in a row below the visualization (not floating over content)
+- Style consistently with the design system:
+```html
+<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+  <button onclick="downloadAsExcel([...], 'board')">
+    Download Excel
+  </button>
+  <button onclick="downloadAsPPTX([...], 'board')">
+    Download PPTX
+  </button>
+  <button onclick="downloadAsDOCX(null, 'board')">
+    Download DOCX
+  </button>
+</div>
+```
+- Each button gets a success toast automatically when the download starts
+- If the CDN library fails to load (no internet), an error toast is shown instead
+- When the user asks for only one format, show only that button
+
+---
+
 ## copyText + toast bridges — feedback on user actions
 
 `copyText(text)` copies `text` to the system clipboard and automatically shows a localized "Copied" toast in the top-right corner of the iframe. Works from HTTPS and HTTP origins (falls back to `execCommand('copy')` if the async Clipboard API is blocked). Use this on "Copy" buttons inside interactive visualizations — data tables, code snippets, shareable values.

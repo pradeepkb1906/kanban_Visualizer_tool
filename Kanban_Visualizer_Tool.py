@@ -1035,6 +1035,106 @@ function _ivDownload() {
     setTimeout(function() { a.remove(); URL.revokeObjectURL(url); }, 60000);
   }
 }
+
+// --- Excel download (SheetJS from CDN) ---
+// Usage: downloadAsExcel([{name:'Sheet1', headers:['Col A','Col B'], rows:[['a1','b1']]}], 'myfile.xlsx')
+function downloadAsExcel(sheets, filename) {
+  filename = (filename || 'export').replace(/\.xlsx$/i, '') + '.xlsx';
+  function _go() {
+    var wb = XLSX.utils.book_new();
+    (sheets || []).forEach(function(s) {
+      var rows = [s.headers || []].concat(s.rows || []);
+      var ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, (s.name || 'Sheet1').substring(0, 31));
+    });
+    try { XLSX.writeFile(wb, filename); toast('Excel file downloading...', 'success'); }
+    catch(e) { toast('Excel export failed', 'error'); }
+  }
+  if (window.XLSX) { _go(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+  s.onload = _go;
+  s.onerror = function() { toast('Excel library failed to load', 'error'); };
+  document.head.appendChild(s);
+}
+
+// --- PPTX download (PptxGenJS from CDN) ---
+// Slide schema: {title, subtitle, items:['...'], table:[[cell,...],...]}
+// Usage: downloadAsPPTX([{title:'Slide 1', items:['Point 1','Point 2']}], 'myfile')
+function downloadAsPPTX(slides, filename) {
+  filename = (filename || 'export').replace(/\.pptx$/i, '');
+  function _go() {
+    var pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE';
+    (slides || []).forEach(function(sd) {
+      var slide = pptx.addSlide();
+      var y = 0.3;
+      if (sd.title) {
+        slide.addText(sd.title, {x:0.4, y:y, w:'95%', h:0.7, fontSize:22, bold:true, color:'1F2937'});
+        y += 0.85;
+      }
+      if (sd.subtitle) {
+        slide.addText(sd.subtitle, {x:0.4, y:y, w:'95%', h:0.4, fontSize:14, color:'6B7280', italic:true});
+        y += 0.55;
+      }
+      if (sd.items && sd.items.length) {
+        sd.items.forEach(function(item) {
+          slide.addText(String(item), {x:0.7, y:y, w:'90%', h:0.38, fontSize:12, color:'374151', bullet:{type:'bullet'}});
+          y += 0.38;
+        });
+      }
+      if (sd.table && sd.table.length) {
+        var rows = sd.table.map(function(row, ri) {
+          return row.map(function(cell) {
+            return {text:String(cell==null?'':cell), options: ri===0 ? {bold:true,fill:{color:'E5E7EB'}} : {}};
+          });
+        });
+        slide.addTable(rows, {x:0.4, y:y, w:12.3, fontSize:11, border:{type:'solid',color:'D1D5DB',pt:0.5}});
+      }
+    });
+    pptx.writeFile({fileName: filename + '.pptx'}).then(function() {
+      try { toast('PowerPoint downloading...', 'success'); } catch(e) {}
+    });
+  }
+  if (window.PptxGenJS) { _go(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+  s.onload = _go;
+  s.onerror = function() { toast('PPTX library failed to load', 'error'); };
+  document.head.appendChild(s);
+}
+
+// --- DOCX download (html-docx-js from CDN) ---
+// Usage: downloadAsDOCX(htmlString, 'myfile.docx')
+// htmlString is the HTML body content to export; if null, exports #iv-render innerHTML.
+function downloadAsDOCX(htmlContent, filename) {
+  filename = (filename || 'export').replace(/\.docx$/i, '') + '.docx';
+  function _go() {
+    var body = htmlContent ||
+      (document.getElementById('iv-render') ? document.getElementById('iv-render').innerHTML : document.body.innerHTML);
+    var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
+      'body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1F2937}' +
+      'table{border-collapse:collapse;width:100%;margin:12pt 0}' +
+      'th,td{border:1px solid #D1D5DB;padding:6px 10px;text-align:left;font-size:10pt}' +
+      'th{background:#F3F4F6;font-weight:bold}' +
+      'h1{font-size:18pt;font-weight:600}h2{font-size:14pt}h3{font-size:12pt}' +
+      'p{margin:0 0 8pt}' +
+      '</style></head><body>' + body + '</body></html>';
+    var blob = htmlDocx.asBlob(fullHtml);
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function() { a.remove(); URL.revokeObjectURL(url); }, 60000);
+    try { toast('Word document downloading...', 'success'); } catch(e) {}
+  }
+  if (window.htmlDocx) { _go(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js';
+  s.onload = _go;
+  s.onerror = function() { toast('DOCX library failed to load', 'error'); };
+  document.head.appendChild(s);
+}
 </script>
 """
 
@@ -2206,6 +2306,20 @@ class Tools:
         - openLink(url) function — opens a URL in a new tab
         - saveState() and loadState() function
         - copyText() function
+        - downloadAsExcel(sheets, filename) — generates and downloads an .xlsx file via SheetJS.
+          sheets is an array of {name, headers, rows} objects.
+          Example: downloadAsExcel([{name:'Kanban', headers:['Task','Status','Owner'], rows:[['Task 1','Done','Alice']]}], 'board.xlsx')
+        - downloadAsPPTX(slides, filename) — generates and downloads a .pptx via PptxGenJS.
+          Each slide: {title, subtitle, items:['...'], table:[[header,...],[row,...]]}.
+          Example: downloadAsPPTX([{title:'Board Summary', table:[['Task','Status'],['Task 1','Done']]}], 'board')
+        - downloadAsDOCX(htmlContent, filename) — generates and downloads a .docx via html-docx-js.
+          htmlContent is the HTML body string to embed; pass null to auto-export the rendered iframe content.
+          Example: downloadAsDOCX('<h1>Board</h1><table>...</table>', 'board.docx')
+
+        To add a download button in your visualization HTML (inside @@@VIZ-START):
+          <button onclick="downloadAsExcel([...], 'board.xlsx')">Download Excel</button>
+          <button onclick="downloadAsPPTX([...], 'board')">Download PPTX</button>
+          <button onclick="downloadAsDOCX(null, 'board.docx')">Download DOCX</button>
 
         :param title: Short descriptive title for the visualization.
         :return: Interactive rich embed rendered in the chat, with LLM context.
