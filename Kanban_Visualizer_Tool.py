@@ -1118,7 +1118,9 @@ function _ivXlsxOoxml(sheets,base){
 }
 
 // ---------------------------------------------------------------------------
-// Pure OOXML .pptx builder — slides:[{title, subtitle, items, table}]
+// Pure OOXML .pptx builder — slides:[{title, subtitle, bg, headerBg, headerH,
+//   titleColor, bodyColor, subtitleColor, accentColor, items, stats, table, footer,
+//   tableHeaderBg, tableHeaderColor}]
 // ---------------------------------------------------------------------------
 function _ivPptxOoxml(slides,base){
   var W=12192000,H=6858000,sld=slides||[],f=[];
@@ -1129,39 +1131,137 @@ function _ivPptxOoxml(slides,base){
   f.push({name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/></Relationships>'});
   f.push({name:'ppt/presentation.xml',data:'<?xml version="1.0" encoding="UTF-8"?><p:presentation xmlns:a="'+NS_A+'" xmlns:r="'+NS_R+'" xmlns:p="'+NS_P+'" saveSubsetFonts="1"><p:sldMasterIdLst><p:sldMasterId id="2148739216" r:id="rIdM1"/></p:sldMasterIdLst><p:sldIdLst>'+sld.map(function(s,i){return '<p:sldId id="'+(256+i)+'" r:id="rId'+(i+1)+'"/>';}).join('')+'</p:sldIdLst><p:sldSz cx="'+W+'" cy="'+H+'" type="custom"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>'});
   f.push({name:'ppt/_rels/presentation.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sld.map(function(s,i){return '<Relationship Id="rId'+(i+1)+'" Type="'+NS_R+'/slide" Target="slides/slide'+(i+1)+'.xml"/>';}).join('')+'<Relationship Id="rIdM1" Type="'+NS_R+'/slideMaster" Target="slideMasters/slideMaster1.xml"/></Relationships>'});
-  // Minimal blank slide master
   f.push({name:'ppt/slideMasters/slideMaster1.xml',data:'<?xml version="1.0" encoding="UTF-8"?><p:sldMaster xmlns:a="'+NS_A+'" xmlns:r="'+NS_R+'" xmlns:p="'+NS_P+'"><p:cSld><p:bg><p:bgRef idx="1001"><a:srgbClr val="FFFFFF"/></p:bgRef></p:bg><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld><p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/><p:sldLayoutIdLst><p:sldLayoutId id="2049" r:id="rIdL1"/></p:sldLayoutIdLst></p:sldMaster>'});
   f.push({name:'ppt/slideMasters/_rels/slideMaster1.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdL1" Type="'+NS_R+'/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>'});
-  // Minimal blank slide layout
   f.push({name:'ppt/slideLayouts/slideLayout1.xml',data:'<?xml version="1.0" encoding="UTF-8"?><p:sldLayout xmlns:a="'+NS_A+'" xmlns:r="'+NS_R+'" xmlns:p="'+NS_P+'" type="blank" preserve="1"><p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld></p:sldLayout>'});
   f.push({name:'ppt/slideLayouts/_rels/slideLayout1.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+NS_R+'/slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>'});
-  // Build slides
   sld.forEach(function(sd,idx){
-    var shapes=[],shId=2,py=457200;
-    if(sd.title){shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="t"/><p:cNvSpPr><a:spLocks noGrp="1"/></p:cNvSpPr><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="685800"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr><p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="2800" b="1" dirty="0"/><a:t>'+_ivXe(sd.title)+'</a:t></a:r></a:p></p:txBody></p:sp>');shId++;py+=800000;}
-    if(sd.subtitle){shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="s"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="457200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr><p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="1600" i="1" dirty="0"/><a:t>'+_ivXe(sd.subtitle)+'</a:t></a:r></a:p></p:txBody></p:sp>');shId++;py+=600000;}
-    if(sd.items&&sd.items.length){var paras=sd.items.map(function(it){return '<a:p><a:pPr marL="342900" indent="-342900"><a:buChar char="&#x2022;"/></a:pPr><a:r><a:rPr lang="en-US" sz="1400" dirty="0"/><a:t>'+_ivXe(String(it))+'</a:t></a:r></a:p>';}).join('');var h=Math.max(457200,sd.items.length*457200);shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="c"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="'+h+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr><p:txBody><a:bodyPr/><a:lstStyle/>'+paras+'</p:txBody></p:sp>');shId++;py+=h+200000;}
+    var bg=sd.bg||'FFFFFF';
+    var headerBg=sd.headerBg||'';
+    var headerH_emu=Math.round((sd.headerH||1.3)*914400);
+    var titleColor=sd.titleColor||(headerBg?'FFFFFF':'1F2937');
+    var bodyColor=sd.bodyColor||(bg!=='FFFFFF'?'F3F4F6':'374151');
+    var subtitleColor=sd.subtitleColor||(bg!=='FFFFFF'?'A3A3A3':'6B7280');
+    var accentColor=sd.accentColor||'0062FF';
+    var shapes=[],shId=2;
+    if(headerBg){
+      shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="hdr"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+        '<p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+W+'" cy="'+headerH_emu+'"/></a:xfrm>'+
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>'+
+        '<a:solidFill><a:srgbClr val="'+headerBg+'"/></a:solidFill>'+
+        '<a:ln><a:noFill/></a:ln></p:spPr>'+
+        '<p:txBody><a:bodyPr/><a:lstStyle/><a:p/></p:txBody></p:sp>');
+      shId++;
+    }
+    var py=headerBg?Math.round(0.2*914400):Math.round(0.3*914400);
+    if(sd.title){
+      shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="ttl"/><p:cNvSpPr><a:spLocks noGrp="1"/></p:cNvSpPr><p:nvPr/></p:nvSpPr>'+
+        '<p:spPr><a:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="594360"/></a:xfrm>'+
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'+
+        '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r>'+
+        '<a:rPr lang="en-US" sz="2800" b="1" dirty="0"><a:solidFill><a:srgbClr val="'+titleColor+'"/></a:solidFill></a:rPr>'+
+        '<a:t>'+_ivXe(sd.title)+'</a:t></a:r></a:p></p:txBody></p:sp>');
+      shId++;
+      py=headerBg?(headerH_emu+Math.round(0.15*914400)):(py+Math.round(0.85*914400));
+    }
+    if(sd.subtitle){
+      shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="sub"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+        '<p:spPr><a:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="457200"/></a:xfrm>'+
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'+
+        '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r>'+
+        '<a:rPr lang="en-US" sz="1600" i="1" dirty="0"><a:solidFill><a:srgbClr val="'+subtitleColor+'"/></a:solidFill></a:rPr>'+
+        '<a:t>'+_ivXe(sd.subtitle)+'</a:t></a:r></a:p></p:txBody></p:sp>');
+      shId++;
+      py+=Math.round(0.55*914400);
+    }
+    if(sd.items&&sd.items.length){
+      var paras=sd.items.map(function(it){
+        return '<a:p><a:pPr marL="342900" indent="-342900">'+
+          '<a:buClr><a:srgbClr val="'+accentColor+'"/></a:buClr>'+
+          '<a:buChar char="&#x2022;"/></a:pPr><a:r>'+
+          '<a:rPr lang="en-US" sz="1400" dirty="0"><a:solidFill><a:srgbClr val="'+bodyColor+'"/></a:solidFill></a:rPr>'+
+          '<a:t>'+_ivXe(String(it))+'</a:t></a:r></a:p>';
+      }).join('');
+      var ith=Math.max(457200,sd.items.length*480000);
+      shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="itm"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+        '<p:spPr><a:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="'+ith+'"/></a:xfrm>'+
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'+
+        '<p:txBody><a:bodyPr/><a:lstStyle/>'+paras+'</p:txBody></p:sp>');
+      shId++;
+      py+=ith+Math.round(0.2*914400);
+    }
+    if(sd.stats&&sd.stats.length){
+      var n=sd.stats.length;
+      var sw=Math.min(Math.round(3.5*914400),Math.floor(11277600/n)-50000);
+      var statBg=bg!=='FFFFFF'?'2D3748':'F3F4F6';
+      sd.stats.forEach(function(st,i){
+        var sx=457200+i*(sw+50000);
+        shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="sb'+i+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+          '<p:spPr><a:xfrm><a:off x="'+sx+'" y="'+py+'"/><a:ext cx="'+sw+'" cy="822960"/></a:xfrm>'+
+          '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>'+
+          '<a:solidFill><a:srgbClr val="'+statBg+'"/></a:solidFill>'+
+          '<a:ln><a:noFill/></a:ln></p:spPr>'+
+          '<p:txBody><a:bodyPr/><a:lstStyle/><a:p/></p:txBody></p:sp>');shId++;
+        shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="sv'+i+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+          '<p:spPr><a:xfrm><a:off x="'+(sx+50000)+'" y="'+(py+60000)+'"/><a:ext cx="'+(sw-100000)+'" cy="400000"/></a:xfrm>'+
+          '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'+
+          '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:pPr algn="ctr"/><a:r>'+
+          '<a:rPr lang="en-US" sz="2400" b="1" dirty="0"><a:solidFill><a:srgbClr val="'+accentColor+'"/></a:solidFill></a:rPr>'+
+          '<a:t>'+_ivXe(String(st.value||''))+'</a:t></a:r></a:p></p:txBody></p:sp>');shId++;
+        shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="sl'+i+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+          '<p:spPr><a:xfrm><a:off x="'+(sx+50000)+'" y="'+(py+480000)+'"/><a:ext cx="'+(sw-100000)+'" cy="280000"/></a:xfrm>'+
+          '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'+
+          '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:pPr algn="ctr"/><a:r>'+
+          '<a:rPr lang="en-US" sz="900" dirty="0"><a:solidFill><a:srgbClr val="'+bodyColor+'"/></a:solidFill></a:rPr>'+
+          '<a:t>'+_ivXe(String(st.label||''))+'</a:t></a:r></a:p></p:txBody></p:sp>');shId++;
+      });
+      py+=Math.round(1.05*914400);
+    }
     if(sd.table&&sd.table.length){
       var cc=Math.max(1,Math.max.apply(null,sd.table.map(function(r){return(r||[]).length;})));
       var cw=Math.floor(11277600/cc);
-      var grid=new Array(cc).join('<a:gridCol w="'+cw+'"/>').concat('<a:gridCol w="'+cw+'"/>');
-      // gridCol repeated cc times
       var gridXml='';for(var gi=0;gi<cc;gi++)gridXml+='<a:gridCol w="'+cw+'"/>';
+      var hdrBg=sd.tableHeaderBg||(bg!=='FFFFFF'?'374151':'E5E7EB');
+      var hdrColor=sd.tableHeaderColor||(bg!=='FFFFFF'?'FFFFFF':'1F2937');
+      var brdColor=bg!=='FFFFFF'?'4B5563':'D1D5DB';
       var trows=sd.table.map(function(row,ri){
         var cells='';
         for(var ci=0;ci<cc;ci++){
           var cv=(row||[])[ci];cv=cv==null?'':String(cv);
-          var brd='<a:lnL w="9525"><a:solidFill><a:srgbClr val="D1D5DB"/></a:solidFill></a:lnL><a:lnR w="9525"><a:solidFill><a:srgbClr val="D1D5DB"/></a:solidFill></a:lnR><a:lnT w="9525"><a:solidFill><a:srgbClr val="D1D5DB"/></a:solidFill></a:lnT><a:lnB w="9525"><a:solidFill><a:srgbClr val="D1D5DB"/></a:solidFill></a:lnB>';
-          cells+='<a:tc><a:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="1100"'+(ri===0?' b="1"':'')+'/>'+
+          var isHdr=ri===0;
+          var cellColor=isHdr?hdrColor:bodyColor;
+          var brd='<a:lnL w="9525"><a:solidFill><a:srgbClr val="'+brdColor+'"/></a:solidFill></a:lnL>'+
+            '<a:lnR w="9525"><a:solidFill><a:srgbClr val="'+brdColor+'"/></a:solidFill></a:lnR>'+
+            '<a:lnT w="9525"><a:solidFill><a:srgbClr val="'+brdColor+'"/></a:solidFill></a:lnT>'+
+            '<a:lnB w="9525"><a:solidFill><a:srgbClr val="'+brdColor+'"/></a:solidFill></a:lnB>';
+          cells+='<a:tc><a:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r>'+
+            '<a:rPr lang="en-US" sz="1100"'+(isHdr?' b="1"':'')+'>'+
+            '<a:solidFill><a:srgbClr val="'+cellColor+'"/></a:solidFill></a:rPr>'+
             '<a:t>'+_ivXe(cv)+'</a:t></a:r></a:p></a:txBody>'+
-            '<a:tcPr>'+(ri===0?'<a:solidFill><a:srgbClr val="E5E7EB"/></a:solidFill>':'')+brd+'</a:tcPr></a:tc>';
+            '<a:tcPr>'+(isHdr?'<a:solidFill><a:srgbClr val="'+hdrBg+'"/></a:solidFill>':'')+brd+'</a:tcPr></a:tc>';
         }
         return '<a:tr h="370840">'+cells+'</a:tr>';
       }).join('');
       var th=sd.table.length*370840;
       shapes.push('<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id="'+shId+'" name="tbl"/><p:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></p:cNvGraphicFramePr><p:nvPr/></p:nvGraphicFramePr><p:xfrm><a:off x="457200" y="'+py+'"/><a:ext cx="11277600" cy="'+th+'"/></p:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/table"><a:tbl><a:tblPr firstRow="1" bandRow="1"/><a:tblGrid>'+gridXml+'</a:tblGrid>'+trows+'</a:tbl></a:graphicData></a:graphic></p:graphicFrame>');
+      shId++;
     }
-    f.push({name:'ppt/slides/slide'+(idx+1)+'.xml',data:'<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="'+NS_A+'" xmlns:r="'+NS_R+'" xmlns:p="'+NS_P+'"><p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'+shapes.join('')+'</p:spTree></p:cSld></p:sld>'});
+    if(sd.footer){
+      shapes.push('<p:sp><p:nvSpPr><p:cNvPr id="'+shId+'" name="ft"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'+
+        '<p:spPr><a:xfrm><a:off x="457200" y="'+Math.round(6.15*914400)+'"/><a:ext cx="11277600" cy="274320"/></a:xfrm>'+
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'+
+        '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r>'+
+        '<a:rPr lang="en-US" sz="800" i="1" dirty="0"><a:solidFill><a:srgbClr val="'+(bg!=='FFFFFF'?'6B7280':'9CA3AF')+'"/></a:solidFill></a:rPr>'+
+        '<a:t>'+_ivXe(sd.footer)+'</a:t></a:r></a:p></p:txBody></p:sp>');
+      shId++;
+    }
+    var bgXml=bg!=='FFFFFF'?'<p:bg><p:bgPr><a:solidFill><a:srgbClr val="'+bg+'"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>':'';
+    f.push({name:'ppt/slides/slide'+(idx+1)+'.xml',
+      data:'<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:a="'+NS_A+'" xmlns:r="'+NS_R+'" xmlns:p="'+NS_P+'">'+
+        '<p:cSld>'+bgXml+'<p:spTree>'+
+        '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'+
+        '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'+
+        shapes.join('')+'</p:spTree></p:cSld></p:sld>'});
     f.push({name:'ppt/slides/_rels/slide'+(idx+1)+'.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="'+NS_R+'/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>'});
   });
   _ivDl(_ivZip(f),base+'.pptx');
@@ -1258,18 +1358,44 @@ function downloadAsExcel(sheets, filename) {
   document.head.appendChild(s);
 }
 
-// Slide schema: {title, subtitle, items:['...'], table:[[cell,...],...]}
-// Usage: downloadAsPPTX([{title:'Slide 1', items:['Point 1','Point 2']}], 'myfile')
+// Slide schema: {title, subtitle, bg, headerBg, headerH, titleColor, bodyColor,
+//   subtitleColor, accentColor, items:['...'], stats:[{value,label},...],
+//   table:[[cell,...],...], footer, tableHeaderBg, tableHeaderColor}
+// Usage: downloadAsPPTX([{title:'S1', bg:'1F2937', headerBg:'0062FF', items:['Pt']}], 'file')
 function downloadAsPPTX(slides, filename) {
   var base=(filename||'export').replace(/\.pptx$/i,'');
   function _go(){
     var pptx=new PptxGenJS();pptx.layout='LAYOUT_WIDE';
     (slides||[]).forEach(function(sd){
-      var slide=pptx.addSlide(),y=0.3;
-      if(sd.title){slide.addText(sd.title,{x:0.4,y:y,w:'95%',h:0.7,fontSize:22,bold:true,color:'1F2937'});y+=0.85;}
-      if(sd.subtitle){slide.addText(sd.subtitle,{x:0.4,y:y,w:'95%',h:0.4,fontSize:14,color:'6B7280',italic:true});y+=0.55;}
-      if(sd.items&&sd.items.length){sd.items.forEach(function(it){slide.addText(String(it),{x:0.7,y:y,w:'90%',h:0.38,fontSize:12,color:'374151',bullet:{type:'bullet'}});y+=0.38;});}
-      if(sd.table&&sd.table.length){var rows=sd.table.map(function(row,ri){return row.map(function(cell){return{text:String(cell==null?'':cell),options:ri===0?{bold:true,fill:{color:'E5E7EB'}}:{}};});});slide.addTable(rows,{x:0.4,y:y,w:12.3,fontSize:11,border:{type:'solid',color:'D1D5DB',pt:0.5}});}
+      var slide=pptx.addSlide();
+      var bg=sd.bg||'FFFFFF';
+      var headerBg=sd.headerBg||'';
+      var headerH=sd.headerH||1.3;
+      var titleColor=sd.titleColor||(headerBg?'FFFFFF':'1F2937');
+      var bodyColor=sd.bodyColor||(bg!=='FFFFFF'?'F3F4F6':'374151');
+      var subtitleColor=sd.subtitleColor||(bg!=='FFFFFF'?'A3A3A3':'6B7280');
+      var accentColor=sd.accentColor||'0062FF';
+      slide.background={color:bg};
+      if(headerBg){slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:'100%',h:headerH,fill:{color:headerBg},line:{type:'none'}});}
+      var y=headerBg?0.2:0.3;
+      if(sd.title){slide.addText(sd.title,{x:0.4,y:y,w:'90%',h:0.65,fontSize:22,bold:true,color:titleColor});y=headerBg?(headerH+0.15):(y+0.85);}
+      if(sd.subtitle){slide.addText(sd.subtitle,{x:0.4,y:y,w:'90%',h:0.4,fontSize:14,italic:true,color:subtitleColor});y+=0.5;}
+      if(sd.items&&sd.items.length){sd.items.forEach(function(it){slide.addText(String(it),{x:0.6,y:y,w:'88%',h:0.38,fontSize:12,color:bodyColor,bullet:{type:'bullet',color:accentColor}});y+=0.4;});y+=0.1;}
+      if(sd.stats&&sd.stats.length){
+        var n=sd.stats.length,sw=Math.min(3.5,12.3/n)-0.1,statBg=bg!=='FFFFFF'?'2D3748':'F3F4F6';
+        sd.stats.forEach(function(st,i){var sx=0.4+i*(sw+0.1);
+          slide.addShape(pptx.ShapeType.rect,{x:sx,y:y,w:sw,h:0.9,fill:{color:statBg},line:{type:'none'}});
+          slide.addText(String(st.value||''),{x:sx+0.05,y:y+0.06,w:sw-0.1,h:0.44,fontSize:22,bold:true,color:accentColor,align:'center'});
+          slide.addText(String(st.label||''),{x:sx+0.05,y:y+0.52,w:sw-0.1,h:0.3,fontSize:9,color:bodyColor,align:'center'});
+        });y+=1.05;
+      }
+      if(sd.table&&sd.table.length){
+        var hdrBg=sd.tableHeaderBg||(bg!=='FFFFFF'?'374151':'E5E7EB');
+        var hdrColor=sd.tableHeaderColor||(bg!=='FFFFFF'?'FFFFFF':'1F2937');
+        var rows=sd.table.map(function(row,ri){return row.map(function(cell){return{text:String(cell==null?'':cell),options:ri===0?{bold:true,fill:{color:hdrBg},color:hdrColor}:{color:bodyColor}};});});
+        slide.addTable(rows,{x:0.4,y:y,w:12.3,fontSize:11,border:{type:'solid',color:bg!=='FFFFFF'?'4B5563':'D1D5DB',pt:0.5}});
+      }
+      if(sd.footer){slide.addText(sd.footer,{x:0.4,y:6.2,w:'90%',h:0.3,fontSize:8,color:bg!=='FFFFFF'?'6B7280':'9CA3AF',italic:true});}
     });
     pptx.writeFile({fileName:base+'.pptx'}).then(function(){try{toast('PowerPoint downloading...','success');}catch(e){}});
   }
@@ -2482,8 +2608,14 @@ class Tools:
           sheets is an array of {name, headers, rows} objects.
           Example: downloadAsExcel([{name:'Kanban', headers:['Task','Status','Owner'], rows:[['Task 1','Done','Alice']]}], 'board.xlsx')
         - downloadAsPPTX(slides, filename) — generates and downloads a .pptx via PptxGenJS.
-          Each slide: {title, subtitle, items:['...'], table:[[header,...],[row,...]]}.
-          Example: downloadAsPPTX([{title:'Board Summary', table:[['Task','Status'],['Task 1','Done']]}], 'board')
+          Each slide supports: {title, subtitle, bg, headerBg, headerH, titleColor, bodyColor,
+            subtitleColor, accentColor, items:['...'], stats:[{value,label},...],
+            table:[[header,...],[row,...]], footer, tableHeaderBg, tableHeaderColor}.
+          bg/headerBg/titleColor etc. are hex strings WITHOUT '#'. Match your visualization colors.
+          Example (IBM Carbon dark): downloadAsPPTX([{title:'Board Summary',
+            bg:'1F2937', headerBg:'0062FF', titleColor:'FFFFFF', bodyColor:'F3F4F6',
+            accentColor:'0062FF', stats:[{value:'71%',label:'CEOs prioritize tech'}],
+            table:[['Task','Status'],['Task 1','Done']], footer:'Source: IBM IBV'}], 'board')
         - downloadAsDOCX(htmlContent, filename) — generates and downloads a .docx via html-docx-js.
           htmlContent is the HTML body string to embed; pass null to auto-export the rendered iframe content.
           Example: downloadAsDOCX('<h1>Board</h1><table>...</table>', 'board.docx')

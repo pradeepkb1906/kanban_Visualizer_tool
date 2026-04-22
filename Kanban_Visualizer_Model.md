@@ -452,21 +452,52 @@ Generates and downloads a `.xlsx` workbook using SheetJS.
 
 ### downloadAsPPTX(slides, filename)
 
-Generates and downloads a `.pptx` file using PptxGenJS. Each slide object supports:
+Generates and downloads a `.pptx` file using PptxGenJS. **Always pass color fields matching your visualization's theme** — this is what makes the PPTX look like the rendered slide, not plain white.
+
+Each slide object supports:
 - `title` — slide heading (22pt bold)
 - `subtitle` — sub-heading (14pt italic)
-- `items` — array of strings rendered as a bullet list
-- `table` — 2-D array; first row is treated as the header row
+- `bg` — slide background hex WITHOUT `#` (e.g. `'1F2937'` for IBM dark)
+- `headerBg` — colored header bar hex (e.g. `'0062FF'` IBM blue, `'10B981'` green)
+- `headerH` — header bar height in inches (default `1.3`)
+- `titleColor` — title text hex (default: `'FFFFFF'` when headerBg set, else `'1F2937'`)
+- `bodyColor` — body/bullet text hex (default: `'F3F4F6'` on dark bg, `'374151'` on light)
+- `subtitleColor` — subtitle text hex (default: `'A3A3A3'` on dark bg)
+- `accentColor` — bullet markers and stat numbers hex (default `'0062FF'`)
+- `items` — array of strings rendered as bullet list
+- `stats` — array of `{value, label}` objects rendered as IBM-style stat cards
+- `table` — 2-D array; first row is the header row
+- `tableHeaderBg` / `tableHeaderColor` — table header fill and text color
+- `footer` — small italic footnote at bottom (source citations etc.)
 
 ```html
 <button onclick="downloadAsPPTX([
-  {title:'Kanban Board', subtitle:'Sprint 12 — April 2026',
-   table:[['Task','Status','Owner'],
-          ['Design mockups','Done','Alice'],
-          ['Backend API','In Progress','Bob'],
-          ['Write tests','To Do','Carol']]}
-], 'kanban-board')">Download PPTX</button>
+  {title:'The imperative for Oracle transformation',
+   subtitle:'Why enterprises are modernising their Oracle estates now',
+   bg:'1F2937', headerBg:'0062FF', headerH:1.3,
+   titleColor:'FFFFFF', bodyColor:'F3F4F6', subtitleColor:'A3A3A3', accentColor:'0062FF',
+   items:[
+     'Legacy Oracle environments drive 60–70% of IT maintenance budgets',
+     'Rising licensing costs push organisations toward hybrid cloud',
+     '71% of CEOs cite technology modernisation as a top-three priority'],
+   stats:[{value:'71%',label:'CEOs prioritise tech modernisation'},
+          {value:'60–70%',label:'IT budget on legacy maintenance'},
+          {value:'2.4x',label:'Faster time-to-market post-migration'}],
+   footer:'SOURCE: IBM INSTITUTE FOR BUSINESS VALUE'},
+  {title:"IBM's transformation approach",
+   subtitle:'A phased methodology for de-risking Oracle modernisation',
+   bg:'1F2937', headerBg:'1F2937',
+   titleColor:'FFFFFF', bodyColor:'D1D5DB', accentColor:'0062FF',
+   items:[
+     'Discover — Automated estate assessment using IBM Mono2Micro',
+     'Design — Target-state architecture on hybrid cloud',
+     'Migrate — Automated schema and data conversion',
+     'Optimise — Continuous performance tuning via IBM watsonx'],
+   footer:'SOURCE: IBM INSTITUTE FOR BUSINESS VALUE'}
+], 'ibm-oracle-transformation')">Download PPTX</button>
 ```
+
+**Rule: always mirror your rendered colors.** If the HTML slide has `background:#1F2937` and a blue header `#0062FF`, pass `bg:'1F2937'` and `headerBg:'0062FF'`. Never leave these fields empty when your visualization uses a dark or branded theme.
 
 ### downloadAsDOCX(htmlContent, filename)
 
